@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesquisa de Satisfação</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background-color: #ffffff;
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-bottom: 28px;
+    }
+
+    .grupo {
+      margin-bottom: 24px;
+    }
+
+    .rotulo {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 10px;
+    }
+
+    .obrigatorio {
+      color: #ef4444;
+    }
+
+    .opcional {
+      color: #64748b;
+      font-weight: 400;
+      font-size: 0.82rem;
+    }
+
+    .notas-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .btn-nota {
+      background-color: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 10px 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-nota:hover {
+      border-color: #4f46e5;
+      background-color: #eef2ff;
+    }
+
+    .btn-nota.ativo {
+      background-color: #4f46e5;
+      border-color: #4f46e5;
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+    }
+
+    .emoji {
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .numero-nota {
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .legenda-nota {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    .recomenda-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-recomenda {
+      background-color: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .btn-recomenda:hover {
+      border-color: #4f46e5;
+      background-color: #eef2ff;
+    }
+
+    .btn-recomenda.ativo {
+      background-color: #4f46e5;
+      border-color: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #0f172a;
+      background-color: #f8fafc;
+      resize: vertical;
+      transition: border-color 0.18s ease, background-color 0.18s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #4f46e5;
+      background-color: #ffffff;
+    }
+
+    .btn-enviar {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background-color: #4f46e5;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.18s ease, opacity 0.18s ease;
+    }
+
+    .btn-enviar:hover:not(:disabled) {
+      background-color: #4338ca;
+    }
+
+    .btn-enviar:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .alerta-erro {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      font-size: 0.88rem;
+      text-align: center;
+      display: none;
+    }
+
+    .agradecimento {
+      display: none;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    .icone-sucesso {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background-color: #dcfce7;
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .agradecimento h2 {
+      font-size: 1.45rem;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .agradecimento p {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .btn-nova {
+      width: 100%;
+      padding: 13px;
+      border: 1.5px solid #4f46e5;
+      border-radius: 12px;
+      background-color: #ffffff;
+      color: #4f46e5;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .btn-nova:hover {
+      background-color: #eef2ff;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div id="areaFormulario">
+      <h1>Pesquisa de Satisfação</h1>
+      <p class="subtitulo">Sua opinião é muito importante para nós!</p>
+
+      <form id="formPesquisa" novalidate>
+        <div class="grupo">
+          <span class="rotulo">Como você avalia sua experiência? <span class="obrigatorio">*</span></span>
+          <div class="notas-grid" role="group" aria-label="Avaliação de 1 a 5">
+            <button type="button" class="btn-nota" data-nota="1" title="1 - Muito Ruim">
+              <span class="emoji">😠</span>
+              <span class="numero-nota">1</span>
+            </button>
+            <button type="button" class="btn-nota" data-nota="2" title="2 - Ruim">
+              <span class="emoji">🙁</span>
+              <span class="numero-nota">2</span>
+            </button>
+            <button type="button" class="btn-nota" data-nota="3" title="3 - Regular">
+              <span class="emoji">😐</span>
+              <span class="numero-nota">3</span>
+            </button>
+            <button type="button" class="btn-nota" data-nota="4" title="4 - Bom">
+              <span class="emoji">🙂</span>
+              <span class="numero-nota">4</span>
+            </button>
+            <button type="button" class="btn-nota" data-nota="5" title="5 - Excelente">
+              <span class="emoji">🤩</span>
+              <span class="numero-nota">5</span>
+            </button>
+          </div>
+          <div class="legenda-nota">
+            <span>1 = Muito Ruim</span>
+            <span>5 = Excelente</span>
+          </div>
+        </div>
+
+        <div class="grupo">
+          <span class="rotulo">Você recomendaria para um amigo? <span class="obrigatorio">*</span></span>
+          <div class="recomenda-grid" role="group" aria-label="Recomendaria para um amigo">
+            <button type="button" class="btn-recomenda" data-recomenda="Sim">Sim</button>
+            <button type="button" class="btn-recomenda" data-recomenda="Não">Não</button>
+          </div>
+        </div>
+
+        <div class="grupo">
+          <label for="comentario" class="rotulo">
+            Deixe um comentário ou sugestão <span class="opcional">(opcional)</span>
+          </label>
+          <textarea id="comentario" placeholder="Conte o que podemos melhorar ou o que você mais gostou..."></textarea>
+        </div>
+
+        <button type="submit" id="btnEnviar" class="btn-enviar">Enviar Avaliação</button>
+        <div id="alertaErro" class="alerta-erro"></div>
+      </form>
+    </div>
+
+    <div id="areaAgradecimento" class="agradecimento">
+      <div class="icone-sucesso">✓</div>
+      <h2>Obrigado pela sua avaliação!</h2>
+      <p>Sua resposta foi registrada com sucesso e ajuda a melhorar nosso atendimento.</p>
+      <button type="button" id="btnNovaResposta" class="btn-nova">Enviar nova resposta</button>
+    </div>
+  </main>
+
+  <script>
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwKr7WQevZ461-MTFoMiu9LfGurUf6lhYOHU7ZVIKp7OP6lH64jLR92LT2U-Wp0ReeDTQ/exec";
+
+    let notaSelecionada = null;
+    let recomendariaSelecionada = null;
+
+    const formPesquisa = document.getElementById("formPesquisa");
+    const btnEnviar = document.getElementById("btnEnviar");
+    const alertaErro = document.getElementById("alertaErro");
+    const areaFormulario = document.getElementById("areaFormulario");
+    const areaAgradecimento = document.getElementById("areaAgradecimento");
+    const btnNovaResposta = document.getElementById("btnNovaResposta");
+    const campoComentario = document.getElementById("comentario");
+
+    const botoesNota = document.querySelectorAll(".btn-nota");
+    botoesNota.forEach((botao) => {
+      botao.addEventListener("click", () => {
+        notaSelecionada = Number(botao.dataset.nota);
+        botoesNota.forEach((b) => b.classList.remove("ativo"));
+        botao.classList.add("ativo");
+        esconderErro();
+      });
+    });
+
+    const botoesRecomenda = document.querySelectorAll(".btn-recomenda");
+    botoesRecomenda.forEach((botao) => {
+      botao.addEventListener("click", () => {
+        recomendariaSelecionada = botao.dataset.recomenda;
+        botoesRecomenda.forEach((b) => b.classList.remove("ativo"));
+        botao.classList.add("ativo");
+        esconderErro();
+      });
+    });
+
+    function mostrarErro(mensagem) {
+      alertaErro.textContent = mensagem;
+      alertaErro.style.display = "block";
+    }
+
+    function esconderErro() {
+      alertaErro.textContent = "";
+      alertaErro.style.display = "none";
+    }
+
+    formPesquisa.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      esconderErro();
+
+      if (!notaSelecionada) {
+        mostrarErro("Por favor, selecione uma avaliação de 1 a 5.");
+        return;
+      }
+
+      if (!recomendariaSelecionada) {
+        mostrarErro("Por favor, informe se você recomendaria para um amigo.");
+        return;
+      }
+
+      if (!URL_SCRIPT || URL_SCRIPT === "COLE_SUA_URL_AQUI") {
+        mostrarErro("Configure a constante URL_SCRIPT antes de enviar.");
+        return;
+      }
+
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = "Enviando...";
+
+      const payload = {
+        nota: notaSelecionada,
+        recomendaria: recomendariaSelecionada,
+        comentario: campoComentario.value.trim()
+      };
+
+      try {
+        await fetch(URL_SCRIPT, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        areaFormulario.style.display = "none";
+        areaAgradecimento.style.display = "block";
+      } catch (erro) {
+        mostrarErro("Não foi possível enviar a avaliação. Verifique sua conexão e tente novamente.");
+      } finally {
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = "Enviar Avaliação";
+      }
+    });
+
+    btnNovaResposta.addEventListener("click", () => {
+      notaSelecionada = null;
+      recomendariaSelecionada = null;
+      botoesNota.forEach((b) => b.classList.remove("ativo"));
+      botoesRecomenda.forEach((b) => b.classList.remove("ativo"));
+      campoComentario.value = "";
+      esconderErro();
+      areaAgradecimento.style.display = "none";
+      areaFormulario.style.display = "block";
+    });
+  </script>
+</body>
+</html>
